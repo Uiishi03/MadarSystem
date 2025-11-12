@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madar System - Create Audit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="custom.css">
+
+    <style>
+
+
+
+    </style>
+</head>
+
+<body>
+<!-- Sidebar Navigation -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <img src="logo.png" height="50" style="margin-right: 10px;">
+        <h4>Madar System</h4>
+    </div>
+    <ul class="sidebar-nav">
+        <li><a href="Auditor.html" ><i class="fas fa-chart-line"></i> <span>Dashboard</span></a></li>
+        <li><a href="add_new_audit.html" class="active"><i class="fas fa-calendar-plus"></i> <span>Create Audit</span></a></li>
+        <li><a href="my_audits.html"><i class="fas fa-clipboard-list"></i> <span>My Audits</span></a></li>
+        <li><a href="#"><i class="fas fa-users"></i> <span>Record Attendance</span></a></li>
+        <li><a href="#"><i class="fas fa-clipboard-check"></i> <span>Fill Checklist</span></a></li>
+        <li><a href="#"><i class="fas fa-camera"></i> <span>Upload Evidence</span></a></li>
+        <li><a href="#"><i class="fas fa-tasks"></i> <span>Track Actions</span></a></li>
+        <li><a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="main-content">
+    <!-- Header -->
+    <nav class="navbar d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <button class="toggle-sidebar" id="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h4 class="mb-0" style="color: var(--dark-blue);">Create New Audit</h4>
+        </div>
+        <div class="d-flex align-items-center">
+            <button class="btn notification-btn">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </button>
+            <div class="dropdown">
+                <button class="btn user-dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <div class="user-avatar">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    <span>Jazwa Alajmi</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Create Audit Form -->
+    <div class="card form-card">
+        <form id="createAuditForm">
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h5 class="section-title"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="auditTitle" class="form-label required-field">Audit Title</label>
+                        <input type="text" class="form-control" id="auditTitle" name="auditTitle" placeholder="Enter audit title" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="plant" class="form-label required-field">Plant/Department</label>
+                        <select class="form-select" id="plant" name="plant" required>
+                            <option value="" selected disabled>Select Plant</option>
+                            <option value="plantA">Plant A - Riyadh</option>
+                            <option value="plantB">Plant B - Jeddah</option>
+                            <option value="plantC">Plant C - Dammam</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="auditDate" class="form-label required-field">Audit Date</label>
+                        <input type="date" class="form-control" id="auditDate" name="auditDate" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="auditDuration" class="form-label required-field">Estimated Duration (hours)</label>
+                        <input type="number" class="form-control" id="auditDuration" name="auditDuration" min="1" max="24" placeholder="e.g., 2" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="auditDescription" class="form-label">Audit Description</label>
+                    <textarea class="form-control" id="auditDescription" name="auditDescription" rows="3" placeholder="Provide a brief description of this audit"></textarea>
+                </div>
+            </div>
+
+            <!-- Equipment Section -->
+            <div class="form-section">
+                <h5 class="section-title"><i class="fas fa-cogs me-2"></i>Equipment to Audit</h5>
+                <div class="mb-3">
+                    <label class="form-label">Select Equipment</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="equip1" name="equipment" value="equip1">
+                        <label class="form-check-label" for="equip1">Boiler System - Model X200</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="equip2" name="equipment" value="equip2">
+                        <label class="form-check-label" for="equip2">Compressor Unit - Model C450</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="equip3" name="equipment" value="equip3">
+                        <label class="form-check-label" for="equip3">Electrical Panel - Main Distribution</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="equip4" name="equipment" value="equip4">
+                        <label class="form-check-label" for="equip4">Fire Safety System</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checklist Section -->
+            <div class="form-section">
+                <h5 class="section-title"><i class="fas fa-clipboard-list me-2"></i>Audit Checklist</h5>
+                <div class="mb-3">
+                    <label for="checklistTemplate" class="form-label">Checklist Template</label>
+                    <select class="form-select" id="checklistTemplate" name="checklistTemplate">
+                        <option value="" selected>Select Template (Optional)</option>
+                        <option value="safety">General Safety Audit</option>
+                        <option value="equipment">Equipment Inspection</option>
+                        <option value="fire">Fire Safety Compliance</option>
+                        <option value="electrical">Electrical Safety</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Or Create Custom Checklist</label>
+                    <div id="checklistItems">
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" placeholder="Add checklist item">
+                            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <small class="text-muted">Add specific items to check during this audit</small>
+                </div>
+            </div>
+
+            <!-- Team Assignment Section -->
+            <div class="form-section">
+                <h5 class="section-title"><i class="fas fa-users me-2"></i>Team Assignment</h5>
+                <div class="mb-3">
+                    <label for="assignedAuditors" class="form-label">Assign Additional Auditors</label>
+                    <select class="form-select" id="assignedAuditors" name="assignedAuditors" multiple>
+                        <option value="aud1">Shouq A.Alshehry</option>
+                        <option value="aud2">Rola Alamri</option>
+                        <option value="aud3">Reyoof Almudarra</option>
+                        <option value="aud4">Alanoud Alkhaldi</option>
+                        <option value="aud5">Sarah Alshammari</option>
+                    </select>
+                    <small class="text-muted">Hold Ctrl/Cmd to select multiple auditors</small>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-outline-secondary me-3">Save as Draft</button>
+                <button type="submit" class="btn btn-primary">Create Audit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="custom.js"></script>
+</body>
+</html>
+
+
