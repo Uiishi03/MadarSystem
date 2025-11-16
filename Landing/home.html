@@ -1,0 +1,735 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madar System - Audit Management Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <style>
+    :root {
+        --ash-gray: #BCD4CC;
+        --dark-blue: #002F45;
+        --earth: #E3A750;
+        --light-bg: #f8f9fa;
+        --sidebar-width: 250px;
+        --sidebar-collapsed: 70px;
+
+        --gradient-ocean: linear-gradient(135deg, var(--ash-gray) 0%, var(--dark-blue) 100%);
+        --gradient-horizon: linear-gradient(135deg, var(--earth) 0%, var(--dark-blue) 100%);
+        --gradient-sky: linear-gradient(135deg, var(--ash-gray) 0%, var(--earth) 50%, var(--dark-blue) 100%);
+        --gradient-frosted: linear-gradient(120deg, var(--light-bg) 0%, var(--ash-gray) 40%, var(--dark-blue) 100%);
+        --gradient-elegant: linear-gradient(to right, var(--dark-blue), var(--earth));
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Segoe UI", sans-serif;
+        overflow-x: hidden;
+        color: #333;
+    }
+
+    .navbar {
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        color: var(--dark-blue);
+    }
+
+    .navbar-brand img {
+        height: 40px;
+        margin-right: 10px;
+    }
+
+    .nav-link {
+        color: var(--dark-blue);
+        font-weight: 500;
+        margin: 0 10px;
+        transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+        color: var(--earth);
+    }
+
+    .btn-primary {
+        background-color: var(--dark-blue);
+        border-color: var(--dark-blue);
+        padding: 0.5rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #001a2a;
+        border-color: #001a2a;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-primary {
+        color: var(--dark-blue);
+        border-color: var(--dark-blue);
+        padding: 0.5rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--dark-blue);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .hero-section {
+        background: var(--gradient-ocean);
+        color: white;
+        padding: 8rem 0 6rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23002F45" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+        background-size: cover;
+        background-position: bottom;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .hero-image {
+        max-width: 100%;
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: perspective(1000px) rotateY(-5deg);
+        transition: transform 0.5s;
+    }
+
+    .hero-image:hover {
+        transform: perspective(1000px) rotateY(0);
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 3rem;
+        color: var(--dark-blue);
+        text-align: center;
+    }
+
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto 4rem;
+    }
+
+    .features-section {
+        padding: 6rem 0;
+        background-color: var(--light-bg);
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        transition: all 0.3s;
+        border-top: 4px solid var(--ash-gray);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border-top-color: var(--dark-blue);
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--dark-blue);
+        margin-bottom: 1.5rem;
+    }
+
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--dark-blue);
+    }
+
+    .feature-text {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .problem-section {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .problem-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        height: auto;
+        border-left: 4px solid #ff6b6b;
+    }
+
+    .problem-icon {
+        font-size: 2rem;
+        color: #ff6b6b;
+        margin-bottom: 1rem;
+    }
+
+    .solution-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        height: auto;
+        border-left: 4px solid var(--earth);
+    }
+
+    .solution-icon {
+        font-size: 2rem;
+        color: var(--earth);
+        margin-bottom: 1rem;
+    }
+
+    .how-it-works-section {
+        padding: 6rem 0;
+        background-color: var(--light-bg);
+    }
+
+    .step-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        text-align: center;
+        position: relative;
+        transition: all 0.3s;
+    }
+
+    .step-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .step-number {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        background: var(--gradient-elegant);
+        color: white;
+        border-radius: 50%;
+        line-height: 50px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .testimonials-section {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .testimonial-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        border-top: 4px solid var(--ash-gray);
+    }
+
+    .testimonial-text {
+        font-style: italic;
+        margin-bottom: 1.5rem;
+        color: #555;
+        line-height: 1.6;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+
+    .testimonial-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--ash-gray);
+        margin-right: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark-blue);
+        font-weight: bold;
+    }
+
+    .cta-section {
+        padding: 6rem 0;
+        background: var(--gradient-ocean);
+        color: white;
+        text-align: center;
+    }
+
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-text {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        opacity: 0.9;
+    }
+
+    .footer {
+        background-color: var(--dark-blue);
+        color: white;
+        padding: 4rem 0 2rem;
+    }
+
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .footer-logo img {
+        height: 40px;
+        margin-right: 10px;
+    }
+
+    .footer-links h5 {
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    .footer-links ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 0.8rem;
+    }
+
+    .footer-links a {
+        color: #b0b7c3;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+        color: white;
+    }
+
+    .copyright {
+        text-align: center;
+        padding-top: 2rem;
+        margin-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #b0b7c3;
+    }
+
+    /* Animation classes for fallback when AOS fails */
+    [data-aos] {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .hero-section {
+            padding: 6rem 0 4rem;
+        }
+    }
+</style>
+
+    <script type="text/javascript" class="flasher-js">(function() {    var rootScript = 'https://cdn.jsdelivr.net/npm/@flasher/flasher@1.3.2/dist/flasher.min.js';    var FLASHER_FLASH_BAG_PLACE_HOLDER = {};    var options = mergeOptions([], FLASHER_FLASH_BAG_PLACE_HOLDER);    function mergeOptions(first, second) {        return {            context: merge(first.context || {}, second.context || {}),            envelopes: merge(first.envelopes || [], second.envelopes || []),            options: merge(first.options || {}, second.options || {}),            scripts: merge(first.scripts || [], second.scripts || []),            styles: merge(first.styles || [], second.styles || []),        };    }    function merge(first, second) {        if (Array.isArray(first) && Array.isArray(second)) {            return first.concat(second).filter(function(item, index, array) {                return array.indexOf(item) === index;            });        }        return Object.assign({}, first, second);    }    function renderOptions(options) {        if(!window.hasOwnProperty('flasher')) {            console.error('Flasher is not loaded');            return;        }        requestAnimationFrame(function () {            window.flasher.render(options);        });    }    function render(options) {        if ('loading' !== document.readyState) {            renderOptions(options);            return;        }        document.addEventListener('DOMContentLoaded', function() {            renderOptions(options);        });    }    if (1 === document.querySelectorAll('script.flasher-js').length) {        document.addEventListener('flasher:render', function (event) {            render(event.detail);        });            }    if (window.hasOwnProperty('flasher') || !rootScript || document.querySelector('script[src="' + rootScript + '"]')) {        render(options);    } else {        var tag = document.createElement('script');        tag.setAttribute('src', rootScript);        tag.setAttribute('type', 'text/javascript');        tag.onload = function () {            render(options);        };        document.head.appendChild(tag);    }})();</script>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img src="http://madar.aspx/logo.png" alt="Madar Logo">
+            Madar System
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#hero-content">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#how-it-works">How It Works</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#testimonials">Testimonials</a>
+                </li>
+
+                <li class="nav-item ms-2">
+                    <a class="btn btn-primary" href="http://madar.aspx/login">Login</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div id="hero-content" class="hero-content">
+                    <h1 class="hero-title">Transform Your Safety Audit Management</h1>
+                    <p class="hero-subtitle">Streamline your safety audits, track compliance, and manage corrective actions with our comprehensive inspection management system.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="#cta" class="btn btn-light btn-lg">Get Started Free</a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                <div class="text-center">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Dashboard Preview" class="hero-image">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Powerful Features for Safety Management</h2>
+        <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Madar System provides all the tools you need to streamline your safety audit processes and ensure compliance.</p>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <h3 class="feature-title">Automated Scheduling</h3>
+                    <p class="feature-text">Easily schedule audits, assign auditors, and set reminders. Never miss an audit deadline again with our automated notification system.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-camera"></i>
+                    </div>
+                    <h3 class="feature-title">Photo Evidence</h3>
+                    <p class="feature-text">Attach photos and documents directly to audit findings. Visual evidence makes issues clearer and resolutions faster.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h3 class="feature-title">Real-time Reporting</h3>
+                    <p class="feature-text">Generate comprehensive reports with a single click. Track performance metrics and compliance rates in real-time.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <h3 class="feature-title">Responsibility Assignment</h3>
+                    <p class="feature-text">Assign corrective actions to responsible persons and track completion status. Ensure accountability across your organization.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="600">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-bell"></i>
+                    </div>
+                    <h3 class="feature-title">Automated Follow-ups</h3>
+                    <p class="feature-text">Set up automatic reminders for pending actions. Reduce manual follow-up efforts and ensure timely resolution of issues.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="700">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3 class="feature-title">Compliance Tracking</h3>
+                    <p class="feature-text">Monitor regulatory compliance across all your facilities. Stay ahead of requirements with our compliance dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Problem & Solution Section -->
+<section id="problem-solution" class="problem-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Solving Real Industry Challenges</h2>
+        <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">We understand the pain points in traditional safety audit processes and provide effective solutions.</p>
+
+        <div class="row g-5">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h3 class="mb-4" style="color: #ff6b6b;">The Problem: Manual Processes</h3>
+
+                <div class="problem-card mb-4">
+                    <div class="problem-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h4>Paper-Based Audits</h4>
+                    <p>Auditors still use paper forms, making the process slow and requiring significant manual effort.</p>
+                </div>
+
+                <div class="problem-card mb-4">
+                    <div class="problem-icon">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <h4>Inefficient Scheduling</h4>
+                    <p>Manual scheduling leads to missed audits, confusion, and poor resource allocation.</p>
+                </div>
+
+                <div class="problem-card mb-4">
+                    <div class="problem-icon">
+                        <i class="bi bi-eye-slash"></i>
+                    </div>
+                    <h4>Limited Visibility</h4>
+                    <p>Management lacks clear visibility into audit results, performance metrics, and compliance status.</p>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h4>Poor Follow-up</h4>
+                    <p>Difficulty tracking corrective actions leads to unresolved safety issues and higher workplace risks.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                <h3 class="mb-4" style="color: var(--earth);">Our Solution: Digital Transformation</h3>
+
+                <div class="solution-card mb-4">
+                    <div class="solution-icon">
+                        <i class="bi bi-tablet"></i>
+                    </div>
+                    <h4>Digital Audit Forms</h4>
+                    <p>Conduct audits using digital forms on any device, with automatic data capture and storage.</p>
+                </div>
+
+                <div class="solution-card mb-4">
+                    <div class="solution-icon">
+                        <i class="bi bi-calendar-week"></i>
+                    </div>
+                    <h4>Automated Scheduling</h4>
+                    <p>Intelligent scheduling system ensures audits are planned, assigned, and completed on time.</p>
+                </div>
+
+                <div class="solution-card mb-4">
+                    <div class="solution-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+                    <h4>Real-time Dashboards</h4>
+                    <p>Comprehensive dashboards provide management with clear insights into safety performance.</p>
+                </div>
+
+                <div class="solution-card">
+                    <div class="solution-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <h4>Action Tracking</h4>
+                    <p>Automated tracking of corrective actions with reminders ensures timely resolution of issues.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="how-it-works-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">How Madar System Works</h2>
+        <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Simple, efficient workflow to transform your safety audit management.</p>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Plan & Schedule</h4>
+                    <p>Set up audit schedules, assign auditors, and define audit criteria for each location or department.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>Conduct Audits</h4>
+                    <p>Auditors complete digital forms on any device, attach photos, and document findings in real-time.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>Assign Actions</h4>
+                    <p>Automatically assign corrective actions to responsible persons with due dates and priorities.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="500">
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4>Track & Report</h4>
+                    <p>Monitor progress, generate compliance reports, and ensure all issues are resolved on time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="footer-logo">
+                    <img src="http://madar.aspx/logo.png" alt="Madar Logo">
+                    <h3>Madar System</h3>
+                </div>
+                <p>Streamlining safety audit management for industrial companies worldwide.</p>
+            </div>
+
+            <div class="col-lg-6 col-md-6 mb-4">
+                <div class="footer-links">
+                    <h5>Product</h5>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Updates</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>&copy; 2025 Madar System. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Load scripts in correct order -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS (Animate On Scroll) with error handling
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true,
+                offset: 100
+            });
+        } else {
+            console.warn('AOS library not loaded. Animations will not work.');
+            // Fallback: remove all data-aos attributes to prevent errors
+            document.querySelectorAll('[data-aos]').forEach(function(el) {
+                el.removeAttribute('data-aos');
+                el.removeAttribute('data-aos-delay');
+            });
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
