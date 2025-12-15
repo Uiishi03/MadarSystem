@@ -1,0 +1,550 @@
+﻿@model Madar.ViewModels.AuditorVMs.ExecuteAuditViewModel
+@{
+    ViewData["Title"] = "Execute Audit";
+    ViewData["PageTitle"] = "Execute Audit: " + Model.Audit.AuditTitle;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Audit Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div>
+                    <h4 class="mb-1">@Model.Audit.AuditTitle</h4>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-industry me-1"></i>@Model.Audit.Schedule?.Plant?.PlantName •
+                        <i class="fas fa-map-marker-alt me-1"></i>@Model.Audit.Schedule?.Plant?.PlantLocation
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-controller="Auditor" asp-action="AssignedSchedules" class="btn btn-outline-danger mb-3">
+                <i class="fas fa-arrow-left me-2"></i>Back to My Schedules
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Quick Stats -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                            <h5 class="card-title">@Model.Audit.Schedule.Allocations.Count</h5>
+                            <p class="card-text text-muted">Team Members</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-camera fa-2x text-info mb-2"></i>
+                            <h5 class="card-title">@Model.Audit.Evidences.Count</h5>
+                            <p class="card-text text-muted">Evidence Items</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-tasks fa-2x text-warning mb-2"></i>
+                            <h5 class="card-title">@Model.Audit.CorrectiveActions.Count</h5>
+                            <p class="card-text text-muted">Corrective Actions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-clock fa-2x text-success mb-2"></i>
+                            <h5 class="card-title">@((DateTime.UtcNow - Model.Audit.CreatedAt).Hours)h ago</h5>
+                            <p class="card-text text-muted">Started</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Corrective Actions List -->
+            <div class="card mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>Corrective Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Audit.CorrectiveActions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Responsible Person</th>
+                                        <th>Deadline</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var action in Model.Audit.CorrectiveActions)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@(action.ActionDescription.Length > 50 ? action.ActionDescription.Substring(0, 50) + "..." : action.ActionDescription)</strong>
+                                            </td>
+                                            <td>
+                                                @if (action.ResponsiblePerson != null)
+                                                {
+                                                    @action.ResponsiblePerson.RespFname @action.ResponsiblePerson.RespLname
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Not assigned</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(action.ActionDeadlineDate < DateOnly.FromDateTime(DateTime.Today) ? "danger" : "secondary")">
+                                                    @action.ActionDeadlineDate.ToString("MMM dd, yyyy")
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(action.ActionStatus == "Pending" ? "primary" : (action.ActionStatus == "InProgress" ? "warning" : "success"))">
+                                                    @action.ActionStatus
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewActionModal"
+                                                        data-description="@action.ActionDescription"
+                                                        data-responsible="@(action.ResponsiblePerson != null ? action.ResponsiblePerson.RespFname + " " + action.ResponsiblePerson.RespLname : "Not assigned")"
+                                                        data-deadline="@action.ActionDeadlineDate.ToString("MMM dd, yyyy")"
+                                                        data-status="@action.ActionStatus">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Corrective Actions Created</h5>
+                            <p class="text-muted">Create your first corrective action to address audit findings.</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createActionModal">
+                                <i class="fas fa-plus me-2"></i>Create First Action
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>Start Executions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Auditor" asp-action="RecordAttendance" asp-route-auditId="@Model.Audit.AuditId"
+                           class="btn btn-outline-primary text-start">
+                            <i class="fas fa-user-check me-2"></i>Record Attendance
+                        </a>
+                        <a asp-controller="Auditor" asp-action="CollectEvidence" asp-route-auditId="@Model.Audit.AuditId"
+                           class="btn btn-outline-info text-start">
+                            <i class="fas fa-camera me-2"></i>Collect Evidence
+                        </a>
+                        <button class="btn btn-outline-warning text-start"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createActionModal">
+                            <i class="fas fa-plus-circle me-2"></i>Create Action
+                        </button>
+
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#completeAuditModal">
+                            <i class="fas fa-flag-checkered me-2"></i>Mark As Complete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Status with Attendance -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-users me-2"></i>Team Members
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var member in Model.Audit.Schedule.Allocations)
+                    {
+                        
+                        var attendance = Model.Audit.Attendances.FirstOrDefault(a => a.AudId == member.AudId);
+                        var status = attendance != null ? attendance.AudAttendStatus : "Not Recorded";
+                        var statusColor = status switch
+                        {
+                            "Present" => "success",
+                            "Late" => "warning",
+                            "Absent" => "danger",
+                            "Excused" => "info",
+                            _ => "secondary"
+                        };
+                        var statusIcon = status switch
+                        {
+                            "Present" => "fa-check-circle",
+                            "Late" => "fa-clock",
+                            "Absent" => "fa-times-circle",
+                            "Excused" => "fa-user-clock",
+                            _ => "fa-question-circle"
+                        };
+                        
+
+                        <div class="team-member mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="member-avatar me-3 @(member.AudId.ToString() == User.FindFirst("AuditorId")?.Value ? "current-user" : "")">
+                                    @member.Auditor.AudFname.Substring(0, 1)@member.Auditor.AudLname.Substring(0, 1)
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong>@member.Auditor.AudFname @member.Auditor.AudLname</strong>
+                                            <div class="member-role">
+                                                <small class="text-muted">@member.RoleType</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-@statusColor">
+                                                <i class="fas @statusIcon me-1"></i>@status
+                                            </span>
+                                            @if (attendance != null && attendance.AudArrivalTime != null)
+                                            {
+                                                <small class="d-block text-muted mt-1">
+                                                    @attendance.AudArrivalTime.Value.ToString(@"hh\:mm")
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Attendance Summary -->
+                    <div class="attendance-summary mt-3 pt-3 border-top">
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <small class="text-muted d-block">Present</small>
+                                <strong class="text-success">@Model.Audit.Attendances.Count(a => a.AudAttendStatus == "Present")</strong>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-muted d-block">Late</small>
+                                <strong class="text-warning">@Model.Audit.Attendances.Count(a => a.AudAttendStatus == "Late")</strong>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-muted d-block">Absent</small>
+                                <strong class="text-danger">@Model.Audit.Attendances.Count(a => a.AudAttendStatus == "Absent")</strong>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-muted d-block">Total</small>
+                                <strong class="text-primary">@Model.Audit.Schedule.Allocations.Count</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- COMPLETE ExecuteAudit.cshtml FILE - Place all this code in one file -->
+<!-- Create Corrective Action Modal -->
+<div class="modal fade" id="createActionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>Create Corrective Action
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" asp-controller="Auditor" asp-action="CreateCorrectiveAction" asp-route-auditId="@Model.Audit.AuditId">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label">Action Description *</label>
+                                <textarea class="form-control" name="ActionDescription" rows="4"
+                                          placeholder="Describe the corrective action needed..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Responsible Person *</label>
+                                <select class="form-control" name="ResponsiblePersonId" required>
+                                    <option value="">Select Responsible Person</option>
+                                    @foreach (var person in Model.ResponsiblePersons)
+                                    {
+                                        <option value="@person.RespId">
+                                            @person.RespFname @person.RespLname - @person.RespRole
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Deadline Date *</label>
+                                <input type="date" class="form-control" name="DeadlineDate"
+                                       min="@DateTime.Today.ToString("yyyy-MM-dd")" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label">Priority *</label>
+                                <select class="form-control" name="Priority" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Create Action
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Action Modal -->
+<div class="modal fade" id="viewActionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Corrective Action Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="action-details">
+                    <div class="detail-item mb-3">
+                        <label class="form-label fw-semibold">Description:</label>
+                        <p id="viewDescription" class="mb-0"></p>
+                    </div>
+                    <div class="detail-item mb-3">
+                        <label class="form-label fw-semibold">Responsible Person:</label>
+                        <p id="viewResponsible" class="mb-0"></p>
+                    </div>
+                    <div class="detail-item mb-3">
+                        <label class="form-label fw-semibold">Deadline:</label>
+                        <p id="viewDeadline" class="mb-0"></p>
+                    </div>
+                    <div class="detail-item">
+                        <label class="form-label fw-semibold">Status:</label>
+                        <p id="viewStatus" class="mb-0"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Complete Audit Modal -->
+<div class="modal fade" id="completeAuditModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-flag-checkered me-2"></i>Complete Audit
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" asp-controller="Auditor" asp-action="CompleteAudit" asp-route-auditId="@Model.Audit.AuditId">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Audit Summary</h6>
+                            <div class="summary-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Team Members:</span>
+                                    <span class="stat-value">@Model.Audit.Schedule.Allocations.Count</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Evidence Collected:</span>
+                                    <span class="stat-value">@Model.Audit.Evidences.Count items</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Corrective Actions:</span>
+                                    <span class="stat-value">@Model.Audit.CorrectiveActions.Count created</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Duration:</span>
+                                    <span class="stat-value">@((DateTime.UtcNow - Model.Audit.CreatedAt).Hours) hours</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="finalComments" class="form-label">Final Comments *</label>
+                                <textarea class="form-control" id="finalComments" name="Comments"
+                                          rows="4" placeholder="Add any final comments or observations about this audit..." required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="auditScore" class="form-label">Audit Score (Optional)</label>
+                                <input type="number" class="form-control" id="auditScore"
+                                       name="Score" min="0" max="100"
+                                       placeholder="Enter score 0-100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> Once completed, this audit will be submitted for management review and cannot be edited.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check me-2"></i>Yes, Complete Audit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .audit-status-badge .badge {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+        }
+
+        .member-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--dark-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+            .member-avatar.current-user {
+                background: var(--earth);
+            }
+
+        .team-member {
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+            .team-member:last-child {
+                border-bottom: none;
+            }
+
+        .action-stats .stat-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+            .action-stats .stat-item:last-child {
+                border-bottom: none;
+            }
+
+        .summary-stats .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+            .summary-stats .stat-item:last-child {
+                border-bottom: none;
+            }
+
+        .stat-label {
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .attendance-summary {
+            font-size: 0.85rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // View Action Modal
+        document.addEventListener('DOMContentLoaded', function () {
+            const viewActionModal = document.getElementById('viewActionModal');
+
+            viewActionModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                document.getElementById('viewDescription').textContent = button.getAttribute('data-description');
+                document.getElementById('viewResponsible').textContent = button.getAttribute('data-responsible');
+                document.getElementById('viewDeadline').textContent = button.getAttribute('data-deadline');
+                document.getElementById('viewStatus').textContent = button.getAttribute('data-status');
+            });
+        });
+    </script>
+}

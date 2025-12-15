@@ -1,0 +1,303 @@
+﻿@model List<Madar.Models.AuditorAllocation>
+@{
+    ViewData["Title"] = "My Assigned Schedules";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="section-title"><i class="fas fa-calendar-check me-2"></i>My Audit Assignments</h5>
+            <p class="text-muted mb-0">View and manage all your assigned audit schedules</p>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Schedule Cards -->
+    <div class="row">
+        @foreach (var allocation in Model)
+        {
+            var schedule = allocation.Schedule;
+            var plant = schedule?.Plant;
+            var isToday = schedule.AudSchDate == DateOnly.FromDateTime(DateTime.Today);
+            var isUpcoming = schedule.AudSchDate > DateOnly.FromDateTime(DateTime.Today);
+            var cardClass = isToday ? "today-schedule" : (isUpcoming ? "upcoming-schedule" : "past-schedule");
+
+            <div class="col-xl-4 col-lg-6 mb-4">
+                <div class="card schedule-card @cardClass">
+                    <div class="card-body">
+                        <!-- Schedule Header -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="card-title mb-1">@plant?.PlantName</h6>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-map-marker-alt me-1"></i>@plant?.PlantLocation
+                                </p>
+                            </div>
+                            <div class="schedule-badge">
+                                <span class="badge bg-@(schedule.AudSchStatus == "Scheduled" ? "primary" : "warning")">
+                                    @schedule.AudSchStatus
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Details -->
+                        <div class="schedule-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-day text-primary"></i>
+                                <div>
+                                    <strong>@schedule.AudSchDate.ToString("MMM dd, yyyy")</strong>
+                                    <small class="d-block text-muted">@schedule.AudSchDate.ToString("dddd")</small>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock text-warning"></i>
+                                <div>
+                                    <strong>@schedule.AudSchDuration hours</strong>
+                                    <small class="d-block text-muted">Duration</small>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-industry text-info"></i>
+                                <div>
+                                    <strong>@plant?.PlantType</strong>
+                                    <small class="d-block text-muted">Plant Type</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assigned Auditors -->
+                        <div class="assigned-auditors mt-3">
+                            <small class="text-muted d-block mb-2">Team Members:</small>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var teamMember in schedule.Allocations)
+                                {
+                                    @* var isCurrent = teamMember.AudId == User.FindFirst("AuditorId")?.Value; *@
+                                    var isCurrent = teamMember.AudId.ToString() == User.FindFirst("AuditorId")?.Value;
+                                    <div class="auditor-avatar-sm @(isCurrent ? "current-user" : "")"
+                                         data-bs-toggle="tooltip"
+                                         title="@teamMember.Auditor.AudFname @teamMember.Auditor.AudLname">
+                                        @teamMember.Auditor.AudFname.Substring(0, 1)@teamMember.Auditor.AudLname.Substring(0, 1)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Equipment Count -->
+                        <div class="equipment-info mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-cogs me-1"></i>
+                                @plant?.Equipment.Count equipment items to audit
+                            </small>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="schedule-actions mt-4">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <a asp-controller="Auditor" asp-action="ViewSchedule" asp-route-scheduleId="@schedule.AudSchId"
+                                       class="btn btn-outline-primary w-100 btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Details
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    @if (schedule.AudSchStatus == "Scheduled")
+                                    {
+                                        <form method="POST" asp-controller="Auditor" asp-action="StartAudit" asp-route-scheduleId="@schedule.AudSchId">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-success w-100 btn-sm">
+                                                <i class="fas fa-play me-1"></i>Start
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (schedule.AudSchStatus == "In_Progress")
+                                    {
+                                        var activeAudit = schedule.Audits.FirstOrDefault(a => a.AuditStatus == "In_Progress");
+                                        @if (activeAudit != null)
+                                        {
+                                            <a asp-controller="Auditor" asp-action="ExecuteAudit" asp-route-auditId="@activeAudit.AuditId" class="btn btn-warning w-100 btn-sm">
+                                                <i class="fas fa-play-circle me-1"></i>Resume
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary w-100 btn-sm" disabled>
+                                                <i class="fas fa-exclamation-triangle me-1"></i>No Active Audit
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-outline-secondary w-100 btn-sm" disabled>
+                                            <i class="fas fa-clock me-1"></i>Pending
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="quick-stats mt-3 pt-3 border-top">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Checklist</small>
+                                    <strong class="text-primary">25 items</strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Equipment</small>
+                                    <strong class="text-warning">@plant?.Equipment.Count</strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Team</small>
+                                    <strong class="text-info">@schedule.Allocations.Count</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="col-12">
+                <div class="card text-center py-5">
+                    <div class="card-body">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Assigned Schedules</h5>
+                        <p class="text-muted">You don't have any audit schedules assigned to you.</p>
+                        <a asp-controller="Auditor" asp-action="Dashboard" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination or Info -->
+    @if (Model.Any())
+    {
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <p class="text-muted">
+                    Showing @Model.Count assigned schedule(s)
+                </p>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .schedule-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0, 47, 69, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--dark-blue);
+        }
+
+            .schedule-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 25px rgba(0, 47, 69, 0.15);
+            }
+
+            .schedule-card.today-schedule {
+                border-left-color: var(--earth);
+                background: rgba(227, 167, 80, 0.02);
+            }
+
+            .schedule-card.upcoming-schedule {
+                border-left-color: var(--dark-blue);
+            }
+
+            .schedule-card.past-schedule {
+                border-left-color: #6c757d;
+                opacity: 0.8;
+            }
+
+        .schedule-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .schedule-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .detail-item i {
+                width: 20px;
+                text-align: center;
+            }
+
+        .auditor-avatar-sm {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--dark-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 2px solid transparent;
+        }
+
+            .auditor-avatar-sm.current-user {
+                background: var(--earth);
+                border-color: var(--dark-blue);
+            }
+
+        .quick-stats {
+            font-size: 0.85rem;
+        }
+
+        .schedule-actions .btn {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+        }
+
+        .equipment-info {
+            font-size: 0.85rem;
+        }
+
+        @@media (max-width: 768px) {
+            .schedule-details {
+                gap: 8px;
+            }
+
+            .detail-item {
+                gap: 8px;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    </script>
+}

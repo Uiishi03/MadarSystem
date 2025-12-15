@@ -1,0 +1,113 @@
+﻿@model Madar.ViewModels.ManagementVMs.ProfileViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Profile";
+    ViewData["PageTitle"] = "My Profile";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user me-2"></i>Profile Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="UpdateProfile" asp-controller="Management">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="section-title mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Basic Information
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name *</label>
+                                    <input type="text" class="form-control" name="Name"
+                                           value="@Model.Name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" name="Email"
+                                           value="@Model.Email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">User Type</label>
+                                    <input type="text" class="form-control" value="@Model.UserType" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password Change -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="section-title mb-3">
+                                    <i class="fas fa-lock me-2"></i>Change Password
+                                </h6>
+                                <p class="text-muted small mb-3">
+                                    Leave password fields blank if you don't want to change your password.
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" name="CurrentPassword">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" class="form-control" name="NewPassword">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" name="ConfirmPassword">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="Dashboard" asp-controller="Management" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Update Profile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

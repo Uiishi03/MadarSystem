@@ -1,0 +1,376 @@
+﻿@model Madar.ViewModels.AreaOwnerVMs.EquipmentListViewModel
+
+@{
+    ViewData["Title"] = "Equipment Management";
+    ViewData["PageTitle"] = "Equipment Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-cogs me-2"></i>Equipment Management
+            </h4>
+            <p class="text-muted mb-0">Manage all equipment for @Model.Plant.PlantName</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEquipmentModal">
+                <i class="fas fa-plus me-2"></i>Add New Equipment
+            </button>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Equipment Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-darkblue"><i class="fas fa-cogs"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Equipment.Count</h5>
+                    <small>Total Equipment</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-green"><i class="fas fa-check-circle"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Equipment.Count(e => e.EquipStatus == "In_Service")</h5>
+                    <small>In Service</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-yellow"><i class="fas fa-tools"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Equipment.Count(e => e.EquipStatus == "Under_Maintenance")</h5>
+                    <small>Maintenance</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-red"><i class="fas fa-times-circle"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Equipment.Count(e => e.EquipStatus == "Out_of_Service")</h5>
+                    <small>Out of Service</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipment Cards -->
+    <div class="row">
+        @if (Model.Equipment != null && Model.Equipment.Any())
+        {
+            @foreach (var item in Model.Equipment)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card equipment-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0">@item.EquipName</h6>
+                            @{
+                                var badgeClass = item.EquipStatus == "In_Service" ? "success" :
+                                item.EquipStatus == "Under_Maintenance" ? "warning" : "danger";
+                            }
+                            <span class="badge bg-@badgeClass">
+                                @item.EquipStatus
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="equipment-details">
+                                <div class="detail-item mb-2">
+                                    <small class="text-muted">Type:</small>
+                                    <div class="fw-semibold">@item.EquipType</div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(item.EquipModel))
+                                {
+                                    <div class="detail-item mb-2">
+                                        <small class="text-muted">Model:</small>
+                                        <div class="fw-semibold">@item.EquipModel</div>
+                                    </div>
+                                }
+                                <div class="detail-item mb-2">
+                                    <small class="text-muted">Location:</small>
+                                    <div class="fw-semibold">@item.EquipLocation</div>
+                                </div>
+                                @if (item.EquipCapacity.HasValue)
+                                {
+                                    <div class="detail-item mb-2">
+                                        <small class="text-muted">Capacity:</small>
+                                        <div class="fw-semibold">@item.EquipCapacity</div>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(item.EquipMaintenCycle))
+                                {
+                                    <div class="detail-item mb-3">
+                                        <small class="text-muted">Maintenance Cycle:</small>
+                                        <div class="fw-semibold">@item.EquipMaintenCycle</div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="equipment-actions mt-3">
+                                <div class="btn-group w-100">
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editEquipmentModal@(item.EquipId)">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteEquipmentModal@(item.EquipId)">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Equipment Modal -->
+                <div class="modal fade" id="editEquipmentModal@(item.EquipId)" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-edit me-2"></i>Edit Equipment
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" asp-controller="Equipment" asp-action="UpdateEquipment" asp-route-equipmentId="@item.EquipId">
+                                @Html.AntiForgeryToken()
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Equipment Name *</label>
+                                        <input type="text" class="form-control" name="EquipName"
+                                               value="@item.EquipName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Equipment Type *</label>
+                                        <input type="text" class="form-control" name="EquipType"
+                                               value="@item.EquipType" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Model</label>
+                                        <input type="text" class="form-control" name="EquipModel"
+                                               value="@item.EquipModel">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Status *</label>
+                                        <select class="form-control" name="EquipStatus" required>
+                                            <option value="In_Service" selected="@(item.EquipStatus == "In_Service")">In Service</option>
+                                            <option value="Out_of_Service" selected="@(item.EquipStatus == "Out_of_Service")">Out of Service</option>
+                                            <option value="Under_Maintenance" selected="@(item.EquipStatus == "Under_Maintenance")">Under Maintenance</option>
+                                            <option value="Retired" selected="@(item.EquipStatus == "Retired")">Retired</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Location *</label>
+                                        <input type="text" class="form-control" name="EquipLocation"
+                                               value="@item.EquipLocation" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Capacity</label>
+                                        <input type="number" class="form-control" name="EquipCapacity"
+                                               value="@item.EquipCapacity">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Maintenance Cycle</label>
+                                        <input type="text" class="form-control" name="EquipMaintenCycle"
+                                               value="@item.EquipMaintenCycle"
+                                               placeholder="e.g., Every 6 months">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Update Equipment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Equipment Modal -->
+                <div class="modal fade" id="deleteEquipmentModal@(item.EquipId)" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-trash me-2"></i>Delete Equipment
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete this equipment?</p>
+                                <div class="alert alert-warning">
+                                    <strong>@item.EquipName</strong><br>
+                                    <small class="text-muted">@item.EquipType • @item.EquipLocation</small>
+                                </div>
+                                <p class="text-danger">This action cannot be undone.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <form method="POST" asp-controller="Equipment" asp-action="DeleteEquipment" asp-route-equipmentId="@item.EquipId" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger">Delete Equipment</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="card text-center py-5">
+                    <div class="card-body">
+                        <i class="fas fa-cogs fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Equipment Found</h5>
+                        <p class="text-muted">Get started by adding your first equipment item.</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEquipmentModal">
+                            <i class="fas fa-plus me-2"></i>Add First Equipment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Create Equipment Modal -->
+<div class="modal fade" id="createEquipmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Add New Equipment
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" asp-controller="Equipment" asp-action="StoreEquipment">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Equipment Name *</label>
+                        <input type="text" class="form-control" name="EquipName"
+                               placeholder="e.g., Conveyor Belt A1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Equipment Type *</label>
+                        <input type="text" class="form-control" name="EquipType"
+                               placeholder="e.g., Conveyor System" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Model</label>
+                        <input type="text" class="form-control" name="EquipModel"
+                               placeholder="e.g., Model X-2000">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status *</label>
+                        <select class="form-control" name="EquipStatus" required>
+                            <option value="In_Service">In Service</option>
+                            <option value="Out_of_Service">Out of Service</option>
+                            <option value="Under_Maintenance">Under Maintenance</option>
+                            <option value="Retired">Retired</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Location *</label>
+                        <input type="text" class="form-control" name="EquipLocation"
+                               placeholder="e.g., Production Line A" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Capacity</label>
+                        <input type="number" class="form-control" name="EquipCapacity"
+                               placeholder="e.g., 1000 kg/hour">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Maintenance Cycle</label>
+                        <input type="text" class="form-control" name="EquipMaintenCycle"
+                               placeholder="e.g., Every 6 months">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Equipment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .equipment-card {
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            transition: transform 0.2s ease;
+        }
+
+            .equipment-card:hover {
+                transform: translateY(-2px);
+            }
+
+            .equipment-card .card-header {
+                background: white;
+                border-bottom: 1px solid #e3e6f0;
+            }
+
+        .equipment-details .detail-item {
+            padding: 5px 0;
+            display: flex;
+            border-bottom: 1px solid #f8f9fa;
+            justify-content: space-between;
+        }
+
+            .equipment-details .detail-item:last-child {
+                border-bottom: none;
+            }
+
+        .equipment-actions .btn-group .btn {
+            border-radius: 0;
+        }
+
+            .equipment-actions .btn-group .btn:first-child {
+                border-top-left-radius: 0.375rem;
+                border-bottom-left-radius: 0.375rem;
+            }
+
+            .equipment-actions .btn-group .btn:last-child {
+                border-top-right-radius: 0.375rem;
+                border-bottom-right-radius: 0.375rem;
+            }
+
+        .card.text-center .card-body {
+            padding: 1.5rem 1rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+    </style>
+}

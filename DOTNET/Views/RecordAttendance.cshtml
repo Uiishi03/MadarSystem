@@ -1,0 +1,226 @@
+﻿@model Madar.Models.Audit
+@{
+    ViewData["Title"] = "Record Attendance";
+    ViewData["PageTitle"] = "Record Audit Attendance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">Record Attendance - @Model.AuditTitle</h4>
+            <p class="text-muted mb-0">
+                <i class="fas fa-industry me-1"></i>@Model.Schedule?.Plant?.PlantName •
+                @Model.Schedule.AudSchDate.ToString("MMM dd, yyyy")
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-controller="Auditor" asp-action="ExecuteAudit" asp-route-auditId="@Model.AuditId"
+               class="btn btn-outline-danger">
+                <i class="fas fa-arrow-left me-2"></i>Back to Audit
+            </a>
+        </div>
+    </div>
+
+    <!-- Attendance Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header card-header text-dark">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users me-2"></i>Team Attendance
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="attendanceForm" method="POST"
+                          asp-controller="Auditor" asp-action="SaveAttendance" asp-route-auditId="@Model.AuditId">
+                        @Html.AntiForgeryToken()
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Auditor</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Arrival Time</th>
+                                        <th>Departure Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int index = 0;
+                                    }
+                                    @foreach (var allocation in Model.Schedule.Allocations)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="auditor-avatar me-3">
+                                                        @allocation.Auditor.AudFname.Substring(0, 1)@allocation.Auditor.AudLname.Substring(0, 1)
+                                                    </div>
+                                                    <div>
+                                                        <strong>@allocation.Auditor.AudFname @allocation.Auditor.AudLname</strong>
+                                                        <br>
+                                                        <small class="text-muted">@allocation.Auditor.AudEmail</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@allocation.RoleType</span>
+                                            </td>
+                                            <td>
+                                                <input type="hidden" name="Attendances[@index].AuditorId" value="@allocation.AudId" />
+                                                <select name="Attendances[@index].Status"
+                                                        class="form-select attendance-status" required>
+                                                    <option value="">Select Status</option>
+                                                    <option value="Present">Present</option>
+                                                    <option value="Absent">Absent</option>
+                                                    <option value="Late">Late</option>
+                                                    <option value="Excused">Excused</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="time"
+                                                       name="Attendances[@index].ArrivalTime"
+                                                       class="form-control time-input">
+                                            </td>
+                                            <td>
+                                                <input type="time"
+                                                       name="Attendances[@index].DepartureTime"
+                                                       class="form-control time-input">
+                                            </td>
+                                        </tr>
+                                        index++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4 p-3 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Save Attendance Records
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Sidebar -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header card-header text-dark">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Attendance Guide
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Status Definitions:</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2">
+                                <span class="badge bg-success me-2">Present</span>
+                                Auditor attended the audit
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-danger me-2">Absent</span>
+                                Auditor did not attend
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-warning me-2">Late</span>
+                                Auditor arrived after start time
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-secondary me-2">Excused</span>
+                                Auditor had prior approval to miss
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <small>
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Note:</strong> Attendance records are required for audit compliance and reporting.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .auditor-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--dark-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .attendance-status:valid {
+            border-color: #198754;
+        }
+
+        .time-input {
+            min-width: 100px;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .card-header {
+            background: var(--dark-blue);
+            color: white;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('attendanceForm');
+            const statusSelects = document.querySelectorAll('.attendance-status');
+
+            statusSelects.forEach(select => {
+                select.addEventListener('change', function () {
+                    const row = this.closest('tr');
+                    const arrivalInput = row.querySelector('input[type="time"]');
+                    if (this.value === 'Present' && !arrivalInput.value) {
+                        const now = new Date();
+                        const timeString = now.toTimeString().substring(0, 5);
+                        arrivalInput.value = timeString;
+                    }
+                });
+            });
+
+            form.addEventListener('submit', function (e) {
+                let hasErrors = false;
+                statusSelects.forEach(select => {
+                    if (!select.value) {
+                        select.classList.add('is-invalid');
+                        hasErrors = true;
+                    } else {
+                        select.classList.remove('is-invalid');
+                    }
+                });
+
+                if (hasErrors) {
+                    e.preventDefault();
+                    alert('Please select attendance status for all team members.');
+                }
+            });
+        });
+    </script>
+}

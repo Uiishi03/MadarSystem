@@ -1,0 +1,68 @@
+﻿<nav class="navbar d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <button class="toggle-sidebar" id="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h4 class="mb-0" style="color: var(--dark-blue);">@ViewData["PageTitle"]</h4>
+    </div>
+
+    <div class="d-flex align-items-center">
+        <!-- Notifications Dropdown -->
+        <div class="dropdown me-3">
+            <button class="btn notification-btn dropdown-toggle" type="button"
+                    data-bs-toggle="dropdown" id="notificationDropdown" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationCount">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
+                id="notificationList">
+                <li class="dropdown-header">Notifications</li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="text-center py-2">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- User Dropdown -->
+        <div class="dropdown">
+            <button class="btn user-dropdown dropdown-toggle" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-avatar">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <span>
+                    @User.Identity.Name
+                    <small class="d-block text-muted" style="font-size: 0.7rem;">
+                        @User.FindFirst("UserType")?.Value
+                    </small>
+                </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" asp-controller="Auditor" asp-action="Profile">
+                        <i class="fas fa-user me-2"></i>My Profile
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-controller="Auditor" asp-action="Dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="#"
+                       onclick="document.getElementById('logout-form').submit(); return false;">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<form id="logout-form" asp-controller="Auth" asp-action="Logout" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>

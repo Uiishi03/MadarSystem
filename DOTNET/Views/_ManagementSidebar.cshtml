@@ -1,0 +1,53 @@
+﻿<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <img src="~/logo.png" height="50" style="margin-right: 10px;" alt="Logo">
+        <h4>Madar System</h4>
+    </div>
+    <ul class="sidebar-nav">
+        <li>
+            <a asp-action="Dashboard" asp-controller="Management"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Users"
+               class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Users" ? "active" : "")">
+                <i class="fas fa-users"></i> <span>User Management</span>
+            </a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Plants"
+               class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Plants" ? "active" : "")">
+                <i class="fas fa-industry"></i> <span>Plant Management</span>
+            </a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="AuditSchedules"
+               class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AuditSchedules" ? "active" : "")">
+                <i class="fas fa-calendar-check"></i> <span>Audit Schedule</span>
+            </a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="CorrectiveActions"
+               class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "CorrectiveActions" ? "active" : "")">
+                <i class="fas fa-tasks"></i> <span>Corrective Actions</span>
+            </a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="PerformanceReports"
+               class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "PerformanceReports" ? "active" : "")">
+                <i class="fas fa-chart-line"></i> <span>Performance Reports</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<form id="logout-form" asp-controller="Auth" asp-action="Logout" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>

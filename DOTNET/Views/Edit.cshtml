@@ -1,0 +1,23 @@
+﻿@model Madar.Models.User
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Edit User";
+    ViewData["PageTitle"] = $"Edit User: {Model.Name}";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>Edit User Account
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <partial name="_UserForm" model="@(new { Action = Url.Action("Update", "Users", new { id = Model.UserId }), Method = "POST", User = Model })" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

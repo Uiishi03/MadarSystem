@@ -1,0 +1,61 @@
+﻿<div class="sidebar" id="sidebar">
+    <div class="sidebar-header d-flex align-items-center">
+        <img src="~/logo.png" height="50" style="margin-right: 10px;" alt="Logo">
+        <h4 class="mb-0">Madar System</h4>
+    </div>
+
+    <ul class="sidebar-nav">
+        <li>
+            <a asp-controller="Auditor" asp-action="Dashboard"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Auditor" asp-action="AssignedSchedules"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "AssignedSchedules" ? "active" : "")">
+                <i class="fas fa-calendar-check me-2"></i>
+                <span>My Schedule</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Auditor" asp-action="Checklists"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Checklists" ? "active" : "")">
+                <i class="fas fa-clipboard-list me-2"></i>
+                <span>Audit Checklists</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Auditor" asp-action="Evidence"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Evidence" ? "active" : "")">
+                <i class="fas fa-camera me-2"></i>
+                <span>Evidence Collection</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Auditor" asp-action="Reports"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Reports" ? "active" : "")">
+                <i class="fas fa-file-alt me-2"></i>
+                <span>My Reports</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="Auditor" asp-action="Tools"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Tools" ? "active" : "")">
+                <i class="fas fa-tools me-2"></i>
+                <span>Audit Tools</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+                <i class="fas fa-sign-out-alt me-2"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<form id="logout-form" asp-controller="Auth" asp-action="Logout" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>

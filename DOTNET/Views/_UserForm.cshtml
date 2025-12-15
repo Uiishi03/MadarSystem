@@ -1,0 +1,176 @@
+﻿@{
+    var action = ViewBag.Action ?? "";
+    var method = ViewBag.Method ?? "POST";
+    var user = ViewBag.User as Madar.Models.User;
+}
+
+<form method="post" action="@action" class="user-form">
+    @if (method != "POST")
+    {
+        <input type="hidden" name="_method" value="PUT" />
+    }
+    @Html.AntiForgeryToken()
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <strong>Please fix the following errors:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- Basic Information Section -->
+    <div class="form-section">
+        <h6 class="section-title">
+            <i class="fas fa-info-circle me-2"></i>Basic Information
+        </h6>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name"
+                           value="@(user?.Name ?? "")"
+                           placeholder="Enter full name" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email"
+                           value="@(user?.Email ?? "")"
+                           placeholder="Enter email address" required>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Information Section -->
+    <div class="form-section">
+        <h6 class="section-title">
+            <i class="fas fa-user-tag me-2"></i>Role Information
+        </h6>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">User Type <span class="text-danger">*</span></label>
+                    <select class="form-control" name="user_type" required @(user != null ? "disabled" : "")>
+                        <option value="">Select User Type</option>
+                        <option value="Management" selected="@(user?.UserType == "Management")">
+                            Management
+                        </option>
+                        <option value="Auditor" selected="@(user?.UserType == "Auditor")">
+                            Auditor
+                        </option>
+                        <option value="AreaOwner" selected="@(user?.UserType == "AreaOwner")">
+                            Area Owner
+                        </option>
+                        <option value="ResponsiblePerson" selected="@(user?.UserType == "ResponsiblePerson")">
+                            Responsible Person
+                        </option>
+                    </select>
+                    @if (user != null)
+                    {
+                        <div class="form-text text-warning">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            User type cannot be changed after creation
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Role/Position <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="role"
+                           value=""
+                           placeholder="e.g., Safety Manager, Senior Auditor" required>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Details Section -->
+    <div class="form-section">
+        <h6 class="section-title">
+            <i class="fas fa-id-card me-2"></i>Personal Details
+        </h6>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="first_name"
+                           value=""
+                           placeholder="Enter first name" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="last_name"
+                           value=""
+                           placeholder="Enter last name" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Extension</label>
+                    <input type="text" class="form-control" name="extension"
+                           value=""
+                           placeholder="e.g., 1234">
+                    <div class="form-text">Optional extension number</div>
+                </div>
+            </div>
+            @if (user == null)
+            {
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password"
+                               placeholder="Enter password" required>
+                        <div class="form-text">Minimum 6 characters</div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Account Status</label>
+                        <div class="form-control-plaintext bg-light p-2 rounded">
+                            <span class="badge bg-success">Active</span>
+                            <span class="ms-2 text-muted">Created: @user.CreatedAt.ToString("MMM dd, yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" asp-controller="Users" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Users
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        @(user != null ? "Update User" : "Create User")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,508 @@
+﻿@model Madar.ViewModels.AreaOwnerVMs.CorrectiveActionListViewModel
+
+@{
+    ViewData["Title"] = "Corrective Actions";
+    ViewData["PageTitle"] = "Corrective Actions Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-tasks me-2"></i>Corrective Actions
+            </h4>
+            <p class="text-muted mb-0">Manage and track all corrective actions for @Model.Plant.PlantName</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignActionModal">
+                <i class="fas fa-plus me-2"></i>Assign New Action
+            </button>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-darkblue"><i class="fas fa-tasks"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Stats.Total</h5>
+                    <small>Total</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-yellow"><i class="fas fa-folder-open"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Stats.Open</h5>
+                    <small>Open</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-gray"><i class="fas fa-spinner"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Stats.InProgress</h5>
+                    <small>In Progress</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-green"><i class="fas fa-check-circle"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Stats.Completed</h5>
+                    <small>Completed</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-red"><i class="fas fa-exclamation-triangle"></i></div>
+                <div>
+                    <h5 class="mb-0">@Model.Stats.Overdue</h5>
+                    <small>Overdue</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card stat-card">
+                <div class="stat-icon mb-3 icon-darkblue"><i class="fas fa-percentage"></i></div>
+                <div>
+                    <h5 class="mb-0">
+                        @(Model.Stats.Total > 0 ? Math.Round((double)Model.Stats.Completed / Model.Stats.Total * 100, 1) : 0)%
+                    </h5>
+                    <small>Completion Rate</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-filter me-2"></i>Filter Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="GET" asp-controller="CorrectiveAction" asp-action="ManageActions">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-control" name="status">
+                                        <option value="">All Statuses</option>
+                                        <option value="Open" selected="@(Model.Filters.Status == "Open")">Open</option>
+                                        <option value="In_Progress" selected="@(Model.Filters.Status == "In_Progress")">In Progress</option>
+                                        <option value="Extended" selected="@(Model.Filters.Status == "Extended")">Extended</option>
+                                        <option value="Completed" selected="@(Model.Filters.Status == "Completed")">Completed</option>
+                                        <option value="Overdue" selected="@(Model.Filters.Status == "Overdue")">Overdue</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Show Overdue Only</label>
+                                    <select class="form-control" name="overdue">
+                                        <option value="">All Actions</option>
+                                        <option value="true" selected="@(Model.Filters.Overdue == true)">Overdue Actions Only</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary mt-4">
+                                        <i class="fas fa-search me-2"></i>Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions List -->
+    <div class="row">
+        @if (Model.Actions != null && Model.Actions.Any())
+        {
+            @foreach (var action in Model.Actions)
+            {
+                <div class="col-lg-4 mb-4">
+                    <div class="card action-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0">
+                                Action #@action.ActionId
+                            </h6>
+                            <div>
+                                @{
+                                    var badgeClass = action.ActionStatus == "Open" ? "primary" :
+                                    action.ActionStatus == "In_Progress" ? "warning" :
+                                    action.ActionStatus == "Completed" ? "success" : "danger";
+                                }
+                                <span class="badge bg-@badgeClass">
+                                    @action.ActionStatus
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Action Description -->
+                            <div class="action-description mb-3">
+                                <p class="mb-2">@action.ActionDescription</p>
+                            </div>
+
+                            <!-- Action Details -->
+                            <div class="action-details mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="detail-item mb-2">
+                                            <small class="text-muted">Assigned To:</small>
+                                            <div class="text-dark">
+                                                @(string.IsNullOrEmpty(action.ResponsiblePersonName) ? "Unassigned" : action.ResponsiblePersonName)
+                                            </div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <small class="text-muted">From Audit:</small>
+                                            <div class="text-dark">@action.AuditTitle</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item mb-2">
+                                            <small class="text-muted">Deadline:</small>
+                                            @{
+                                                var deadlineClass = action.IsOverdue && action.ActionStatus != "Completed" ? "text-danger" : "text-primary";
+                                            }
+                                            <div class="text-dark @deadlineClass">
+                                                @action.ActionDeadlineDate.ToString("MMM dd, yyyy")
+                                            </div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <small class="text-muted">Evidence:</small>
+                                            <div class="text-dark">
+                                                @action.EvidenceCount file(s) attached
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            @{
+                                var progress = action.ActionStatus == "Completed" ? 100 :
+                                action.ActionStatus == "In_Progress" ? 50 :
+                                action.ActionStatus == "Open" ? 10 : 0;
+                                var progressClass = action.ActionStatus == "Completed" ? "success" :
+                                action.ActionStatus == "In_Progress" ? "warning" : "primary";
+                            }
+                            <div class="progress mb-3" style="height: 8px;">
+                                <div class="progress-bar bg-@progressClass"
+                                     style="width: @progress%"></div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <div class="btn-group w-100">
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#updateStatusModal@(action.ActionId)">
+                                        <i class="fas fa-sync me-1"></i>Update Status
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#extendDeadlineModal@(action.ActionId)"
+                                            @(action.ActionStatus == "Completed" ? "disabled" : "")>
+                                        <i class="fas fa-calendar-plus me-1"></i>Extend
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewEvidenceModal@(action.ActionId)">
+                                        <i class="fas fa-eye me-1"></i>
+                                    </button>
+                                    @if (action.IsOverdue && action.ActionStatus != "Completed" && action.ActionStatus != "Overdue")
+                                    {
+                                        <button class="btn btn-outline-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#escalateModal@(action.ActionId)">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Escalate
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update Status Modal -->
+                <div class="modal fade" id="updateStatusModal@(action.ActionId)" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-sync me-2"></i>Update Action Status
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" asp-controller="CorrectiveAction" asp-action="UpdateActionStatus" asp-route-actionId="@action.ActionId">
+                                @Html.AntiForgeryToken()
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">New Status</label>
+                                        <select class="form-control" name="ActionStatus" required>
+                                            <option value="Open" selected="@(action.ActionStatus == "Open")">Open</option>
+                                            <option value="In_Progress" selected="@(action.ActionStatus == "In_Progress")">In Progress</option>
+                                            <option value="Completed" selected="@(action.ActionStatus == "Completed")">Completed</option>
+                                            <option value="Rejected" selected="@(action.ActionStatus == "Rejected")">Rejected</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Update Status</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extend Deadline Modal -->
+                <div class="modal fade" id="extendDeadlineModal@(action.ActionId)" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-calendar-plus me-2"></i>Extend Deadline
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" asp-controller="CorrectiveAction" asp-action="ExtendDeadline" asp-route-actionId="@action.ActionId">
+                                @Html.AntiForgeryToken()
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Deadline</label>
+                                        <input type="text" class="form-control" value="@action.ActionDeadlineDate.ToString("MMM dd, yyyy")" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">New Deadline *</label>
+                                        <input type="date" class="form-control" name="NewDeadline"
+                                               min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Reason for Extension *</label>
+                                        <textarea class="form-control" name="ExtensionReason" rows="3"
+                                          placeholder="Explain why you need to extend the deadline..." required></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-warning">Extend Deadline</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Escalate Modal -->
+                @if (action.IsOverdue)
+                {
+                    <div class="modal fade" id="escalateModal@(action.ActionId)" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Escalate to Management
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to escalate this action to management?</p>
+                                    <div class="alert alert-warning">
+                                        <strong>Action #@action.ActionId</strong><br>
+                                        <small class="text-muted">@(action.ActionDescription.Length > 100 ? action.ActionDescription.Substring(0, 100) + "..." : action.ActionDescription)</small>
+                                    </div>
+                                    <p class="text-danger">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        This will mark the action as overdue and notify management for intervention.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form method="POST" asp-controller="CorrectiveAction" asp-action="EscalateAction" asp-route-actionId="@action.ActionId" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger">Yes, Escalate</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="card text-center py-5">
+                    <div class="card-body">
+                        <i class="fas fa-tasks fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Corrective Actions Found</h5>
+                        <p class="text-muted">Get started by assigning your first corrective action.</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignActionModal">
+                            <i class="fas fa-plus me-2"></i>Assign First Action
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Assign Action Modal -->
+<div class="modal fade" id="assignActionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Assign New Corrective Action
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" asp-controller="CorrectiveAction" asp-action="AssignAction">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Audit *</label>
+                        <select class="form-control" name="AuditId" required>
+                            <option value="">Select Audit</option>
+                            @if (Model.Audits != null)
+                            {
+                                @foreach (var audit in Model.Audits)
+                                {
+                                    <option value="@audit.AuditId">
+                                        @audit.AuditTitle
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assign To *</label>
+                        <select class="form-control" name="RespId" required>
+                            <option value="">Select Responsible Person</option>
+                            @if (Model.ResponsiblePersons != null)
+                            {
+                                @foreach (var person in Model.ResponsiblePersons)
+                                {
+                                    <option value="@person.RespId">
+                                        @person.FullName
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Action Description *</label>
+                        <textarea class="form-control" name="ActionDescription" rows="4"
+                                  placeholder="Describe the corrective action needed..." required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Deadline Date *</label>
+                                <input type="date" class="form-control" name="ActionDeadlineDate"
+                                       min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority *</label>
+                                <select class="form-control" name="Priority" required>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign Action</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .action-card {
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            transition: transform 0.2s ease;
+        }
+
+            .action-card:hover {
+                transform: translateY(-2px);
+            }
+
+            .action-card .card-header {
+                background: white;
+                border-bottom: 1px solid #e3e6f0;
+            }
+
+        .action-details .detail-item {
+            padding: 3px 0;
+        }
+
+        .evidence-item {
+            background: #f8f9fa;
+        }
+
+        .btn-group .btn {
+            border-radius: 0;
+            font-size: 0.8rem;
+        }
+
+            .btn-group .btn:first-child {
+                border-top-left-radius: 0.375rem;
+                border-bottom-left-radius: 0.375rem;
+            }
+
+            .btn-group .btn:last-child {
+                border-top-right-radius: 0.375rem;
+                border-bottom-right-radius: 0.375rem;
+            }
+
+        .progress {
+            background-color: #e9ecef;
+        }
+    </style>
+}

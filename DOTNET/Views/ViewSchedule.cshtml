@@ -1,0 +1,285 @@
+﻿@model Madar.Models.AuditorAllocation
+@{
+    ViewData["Title"] = "Schedule Details";
+    ViewData["PageTitle"] = "Schedule Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header with Back Button -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <a asp-controller="Auditor" asp-action="AssignedSchedules" class="btn btn-outline-danger mb-3">
+                <i class="fas fa-arrow-left me-2"></i>Back to Schedules
+            </a>
+            <h5 class="section-title">
+                <i class="fas fa-clipboard-list me-2"></i>
+                Audit Preparation: @Model.Schedule?.Plant?.PlantName
+            </h5>
+        </div>
+        <div class="col-md-4 text-end">
+            @if (Model.Schedule.AudSchStatus == "Scheduled")
+            {
+                <form method="POST" asp-controller="Auditor" asp-action="StartAudit" asp-route-scheduleId="@Model.Schedule.AudSchId" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="fas fa-play me-2"></i>Start Audit
+                    </button>
+                </form>
+            }
+            else if (Model.Schedule.AudSchStatus == "In_Progress")
+            {
+                var activeAudit = Model.Schedule.Audits.FirstOrDefault(a => a.AuditStatus == "In_Progress");
+                if (activeAudit != null)
+                {
+                    <a asp-controller="Auditor" asp-action="ExecuteAudit" asp-route-auditId="@activeAudit.AuditId" class="btn btn-warning btn-sm text-white">
+                        <i class="fas fa-play-circle me-2"></i>Resume Audit
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary btn-sm" disabled>
+                        <i class="fas fa-exclamation-triangle me-2"></i>No Active Audit
+                    </button>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Schedule Overview -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <!-- Basic Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Schedule Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td width="40%"><strong>Plant:</strong></td>
+                                    <td>@Model.Schedule?.Plant?.PlantName</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Location:</strong></td>
+                                    <td>@Model.Schedule?.Plant?.PlantLocation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Plant Type:</strong></td>
+                                    <td>@Model.Schedule?.Plant?.PlantType</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Capacity:</strong></td>
+                                    <td>@Model.Schedule?.Plant?.PlantCapacity</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td width="40%"><strong>Schedule Date:</strong></td>
+                                    <td>@Model.Schedule.AudSchDate.ToString("MMMM dd, yyyy")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Duration:</strong></td>
+                                    <td>@Model.Schedule.AudSchDuration hours</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        <span class="badge bg-@(Model.Schedule.AudSchStatus == "Scheduled" ? "primary" : "warning")">
+                                            @Model.Schedule.AudSchStatus
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Equipment Count:</strong></td>
+                                    <td>@Model.Schedule?.Plant?.Equipment.Count</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Previous Audits History -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-history me-2"></i>Previous Audits at This Plant</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Schedule.Audits.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Audit Date</th>
+                                        <th>Status</th>
+                                        <th>Findings</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var audit in Model.Schedule.Audits.Take(5))
+                                    {
+                                        <tr>
+                                            <td>@audit.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                <span class="badge bg-@(audit.AuditStatus == "Closed" ? "success" : "warning")">
+                                                    @audit.AuditStatus
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var findingsCount = audit.CorrectiveActions.Count;
+                                                }
+                                                @findingsCount finding(s)
+                                            </td>
+                                            <td>
+                                                @if (audit.Histories.Any())
+                                                {
+                                                    <text>@(audit.Histories.First().AudHistoryScore?.ToString() ?? "N/A") / 100</text>
+                                                                                        }
+                                                else
+                                                {
+                                                    <text>N/A</text>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                            <p>No previous audits found for this plant</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Equipment to Audit -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-cogs me-2"></i>Equipment to Audit</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Schedule?.Plant?.Equipment.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Equipment Name</th>
+                                        <th>Type</th>
+                                        <th>Model</th>
+                                        <th>Status</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var equipment in Model.Schedule.Plant.Equipment)
+                                    {
+                                        <tr>
+                                            <td>@equipment.EquipName</td>
+                                            <td>@equipment.EquipType</td>
+                                            <td>@equipment.EquipModel</td>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    @equipment.EquipStatus
+                                                </span>
+                                            </td>
+                                            <td>@equipment.EquipLocation</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-cogs fa-2x mb-2"></i>
+                            <p>No equipment registered for this plant</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar - Audit Team -->
+        <div class="col-lg-4">
+            <!-- Audit Team -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>Audit Team</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var teamMember in Model.Schedule.Allocations)
+                    {
+                        var isCurrent = teamMember.AudId.ToString() == User.FindFirst("AuditorId")?.Value;
+                        <div class="col-md-12 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="auditor-avatar-lg me-3 @(isCurrent ? "current-user" : "")">
+                                    @teamMember.Auditor.AudFname.Substring(0, 1)@teamMember.Auditor.AudLname.Substring(0, 1)
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">
+                                        @teamMember.Auditor.AudFname @teamMember.Auditor.AudLname
+                                        @if (isCurrent)
+                                        {
+                                            <span class="badge bg-primary ms-2">You</span>
+                                        }
+                                    </h6>
+                                    <p class="text-muted mb-0 small">
+                                        @teamMember.Auditor.AudRole
+                                        <br>
+                                        <i class="fas fa-phone me-1"></i>@(teamMember.Auditor.AudExtension ?? "N/A")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .auditor-avatar-lg {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--dark-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            border: 3px solid transparent;
+        }
+
+            .auditor-avatar-lg.current-user {
+                background: var(--earth);
+                border-color: var(--dark-blue);
+            }
+
+        .table-borderless td {
+            padding: 0.5rem;
+        }
+
+        .section-title {
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+    </style>
+}

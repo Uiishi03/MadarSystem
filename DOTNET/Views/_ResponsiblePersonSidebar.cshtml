@@ -1,0 +1,68 @@
+﻿<div class="sidebar" id="sidebar">
+    <div class="sidebar-header d-flex align-items-center">
+        <img src="~/logo.png" height="50" style="margin-right: 10px;" alt="Logo">
+        <h4 class="mb-0">Madar System</h4>
+    </div>
+
+    <ul class="sidebar-nav">
+        <li>
+            <a asp-controller="ResponsiblePerson" asp-action="Dashboard"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="fas fa-chart-line me-2"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="ResponsiblePerson" asp-action="CreateAudit"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "CreateAudit" ? "active" : "")">
+                <i class="fas fa-calendar-plus me-2"></i>
+                <span>Create Audit</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="ResponsiblePerson" asp-action="MyAudits"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "MyAudits" ? "active" : "")">
+                <i class="fas fa-clipboard-list me-2"></i>
+                <span>My Audits</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="ResponsiblePerson" asp-action="RecordAttendance"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "RecordAttendance" ? "active" : "")">
+                <i class="fas fa-users me-2"></i>
+                <span>Record Attendance</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="ResponsiblePerson" asp-action="FillChecklist"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "FillChecklist" ? "active" : "")">
+                <i class="fas fa-clipboard-check me-2"></i>
+                <span>Fill Checklist</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="ResponsiblePerson" asp-action="UploadEvidence"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "UploadEvidence" ? "active" : "")">
+                <i class="fas fa-camera me-2"></i>
+                <span>Upload Evidence</span>
+            </a>
+        </li>
+        <li>
+            <a asp-controller="ResponsiblePerson" asp-action="TrackActions"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "TrackActions" ? "active" : "")">
+                <i class="fas fa-tasks me-2"></i>
+                <span>Track Actions</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+                <i class="fas fa-sign-out-alt me-2"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<form id="logout-form" asp-controller="Auth" asp-action="Logout" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>

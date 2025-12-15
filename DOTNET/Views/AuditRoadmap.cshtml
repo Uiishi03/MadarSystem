@@ -1,0 +1,505 @@
+﻿@{
+    ViewData["Title"] = "Auditor Roadmap";
+    ViewData["PageTitle"] = "Safety Audit Roadmap";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-project-diagram me-2"></i>Safety Audit Process Tree
+            </h4>
+            <p class="text-muted mb-0">Complete workflow for successful safety audit execution</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-controller="Auditor" asp-action="Dashboard" class="btn btn-outline-primary">
+                <i class="fas fa-home me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Audit Process Tree -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="process-tree">
+                        <!-- Level 1: Start Audit -->
+                        <div class="tree-node root-node">
+                            <div class="node-content">
+                                <i class="fas fa-play-circle text-primary me-2"></i>
+                                <strong>Start Safety Audit</strong>
+                                <small class="text-muted d-block">Begin audit execution process</small>
+                            </div>
+                        </div>
+
+                        <!-- Level 2: Pre-Audit Phase -->
+                        <div class="tree-branch">
+                            <div class="tree-node phase-node">
+                                <div class="node-content">
+                                    <i class="fas fa-clipboard-list text-info me-2"></i>
+                                    <strong>Phase 1: Pre-Audit Preparation</strong>
+                                    <small class="text-muted d-block">Setup and planning</small>
+                                </div>
+                            </div>
+
+                            <div class="tree-children">
+                                <div class="tree-node task-node">
+                                    <div class="node-content">
+                                        <i class="fas fa-calendar-check me-2"></i>
+                                        Review Audit Schedule
+                                    </div>
+                                </div>
+                                <div class="tree-node task-node">
+                                    <div class="node-content">
+                                        <i class="fas fa-industry me-2"></i>
+                                        Study Plant Details
+                                    </div>
+                                </div>
+                                <div class="tree-node task-node">
+                                    <div class="node-content">
+                                        <i class="fas fa-users me-2"></i>
+                                        Review Team Assignments
+                                    </div>
+                                </div>
+                                <div class="tree-node task-node">
+                                    <div class="node-content">
+                                        <i class="fas fa-list-check me-2"></i>
+                                        Prepare Checklist
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Level 2: On-Site Phase -->
+                        <div class="tree-branch">
+                            <div class="tree-node phase-node">
+                                <div class="node-content">
+                                    <i class="fas fa-hard-hat text-warning me-2"></i>
+                                    <strong>Phase 2: On-Site Execution</strong>
+                                    <small class="text-muted d-block">Field work and data collection</small>
+                                </div>
+                            </div>
+
+                            <div class="tree-children">
+                                <!-- Attendance Sub-Branch -->
+                                <div class="tree-branch">
+                                    <div class="tree-node subphase-node">
+                                        <div class="node-content">
+                                            <i class="fas fa-user-check me-2"></i>
+                                            Team Attendance
+                                        </div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                Record Present/Absent Status
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-clock me-2"></i>
+                                                Log Arrival/Departure Times
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-tasks me-2"></i>
+                                                Assign Area Responsibilities
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Inspection Sub-Branch -->
+                                <div class="tree-branch">
+                                    <div class="tree-node subphase-node">
+                                        <div class="node-content">
+                                            <i class="fas fa-search me-2"></i>
+                                            Safety Inspection
+                                        </div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-walking me-2"></i>
+                                                Conduct Walkthrough
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-clipboard-check me-2"></i>
+                                                Complete Checklist Items
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Identify Hazards & Risks
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Evidence Sub-Branch -->
+                                <div class="tree-branch">
+                                    <div class="tree-node subphase-node">
+                                        <div class="node-content">
+                                            <i class="fas fa-camera me-2"></i>
+                                            Evidence Collection
+                                        </div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-camera me-2"></i>
+                                                Take Photos of Findings
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-file-pdf me-2"></i>
+                                                Upload Documents
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-sticky-note me-2"></i>
+                                                Record Observations
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Level 2: Post-Audit Phase -->
+                        <div class="tree-branch">
+                            <div class="tree-node phase-node">
+                                <div class="node-content">
+                                    <i class="fas fa-tasks text-success me-2"></i>
+                                    <strong>Phase 3: Post-Audit Actions</strong>
+                                    <small class="text-muted d-block">Documentation and follow-up</small>
+                                </div>
+                            </div>
+
+                            <div class="tree-children">
+                                <!-- Corrective Actions Sub-Branch -->
+                                <div class="tree-branch">
+                                    <div class="tree-node subphase-node">
+                                        <div class="node-content">
+                                            <i class="fas fa-wrench me-2"></i>
+                                            Corrective Actions
+                                        </div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                Create Action Items
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-user-tie me-2"></i>
+                                                Assign Responsible Persons
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-calendar-day me-2"></i>
+                                                Set Deadlines
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-link me-2"></i>
+                                                Link Evidence to Actions
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Documentation Sub-Branch -->
+                                <div class="tree-branch">
+                                    <div class="tree-node subphase-node">
+                                        <div class="node-content">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            Documentation
+                                        </div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-sticky-note me-2"></i>
+                                                Write Audit Summary
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-chart-bar me-2"></i>
+                                                Calculate Audit Score
+                                            </div>
+                                        </div>
+                                        <div class="tree-node task-node">
+                                            <div class="node-content">
+                                                <i class="fas fa-check-double me-2"></i>
+                                                Review All Findings
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Level 1: Complete Audit -->
+                        <div class="tree-node root-node final-node">
+                            <div class="node-content">
+                                <i class="fas fa-flag-checkered text-success me-2"></i>
+                                <strong>Complete & Submit Audit</strong>
+                                <small class="text-muted d-block">Finalize and send for management review</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-key me-2"></i>Process Legend
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="legend-item mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="legend-color phase-node me-3"></div>
+                                    <div>
+                                        <strong>Phase</strong>
+                                        <small class="text-muted d-block">Major audit stages</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="legend-item mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="legend-color subphase-node me-3"></div>
+                                    <div>
+                                        <strong>Sub-Phase</strong>
+                                        <small class="text-muted d-block">Specific activity groups</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="legend-item mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="legend-color task-node me-3"></div>
+                                    <div>
+                                        <strong>Task</strong>
+                                        <small class="text-muted d-block">Individual actions to complete</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="legend-color root-node me-3"></div>
+                                    <div>
+                                        <strong>Start/End Points</strong>
+                                        <small class="text-muted d-block">Process boundaries</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Quick Tips
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="tip-item mb-3">
+                        <i class="fas fa-arrow-down text-primary me-2"></i>
+                        <strong>Sequential Flow:</strong> Follow steps from top to bottom
+                    </div>
+                    <div class="tip-item mb-3">
+                        <i class="fas fa-check-double text-success me-2"></i>
+                        <strong>Complete All Tasks:</strong> Ensure all items are done before moving to next phase
+                    </div>
+                    <div class="tip-item mb-3">
+                        <i class="fas fa-camera text-info me-2"></i>
+                        <strong>Document Everything:</strong> Collect evidence for all findings
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-clock text-warning me-2"></i>
+                        <strong>Time Management:</strong> Allocate sufficient time for each phase
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .process-tree {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .tree-node {
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .node-content {
+            padding: 15px 20px;
+            border-radius: 8px;
+            background: white;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .root-node .node-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .final-node .node-content {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .phase-node .node-content {
+            background: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            font-weight: 600;
+        }
+
+        .subphase-node .node-content {
+            background: #fff;
+            border-left: 4px solid #ffc107;
+            font-weight: 500;
+        }
+
+        .task-node .node-content {
+            background: #fff;
+            border-left: 4px solid #28a745;
+            margin-left: 30px;
+        }
+
+        .tree-branch {
+            position: relative;
+            margin-left: 40px;
+        }
+
+            .tree-branch::before {
+                content: '';
+                position: absolute;
+                left: -20px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: #dee2e6;
+            }
+
+        .tree-children {
+            position: relative;
+            margin-left: 40px;
+        }
+
+            .tree-children::before {
+                content: '';
+                position: absolute;
+                left: -20px;
+                top: -15px;
+                bottom: -15px;
+                width: 2px;
+                background: #dee2e6;
+            }
+
+        .tree-node::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            width: 20px;
+            height: 2px;
+            background: #dee2e6;
+        }
+
+        .root-node::before, .phase-node::before {
+            display: none;
+        }
+
+        /* Legend Styles */
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #e9ecef;
+        }
+
+        .legend-color.phase-node {
+            background: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .legend-color.subphase-node {
+            background: #fff;
+            border-left: 4px solid #ffc107;
+        }
+
+        .legend-color.task-node {
+            background: #fff;
+            border-left: 4px solid #28a745;
+        }
+
+        .legend-color.root-node {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .tip-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #6c757d;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .tree-branch {
+                margin-left: 20px;
+            }
+
+            .tree-children {
+                margin-left: 20px;
+            }
+
+            .task-node .node-content {
+                margin-left: 15px;
+            }
+        }
+    </style>
+}

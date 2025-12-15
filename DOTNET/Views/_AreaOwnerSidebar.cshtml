@@ -1,0 +1,75 @@
+﻿<div class="sidebar" id="sidebar">
+    <div class="sidebar-header d-flex align-items-center">
+        <img src="~/logo.png" height="50" style="margin-right: 10px;" alt="Logo">
+        <h4 class="mb-0">Madar System</h4>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <ul class="sidebar-nav">
+        <!-- Dashboard -->
+        <li>
+            <a asp-controller="AreaOwner" asp-action="Dashboard"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Plant Management -->
+        <li>
+            <a asp-controller="AreaOwner" asp-action="ManagePlants"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Plant") == true ? "active" : "")">
+                <i class="fas fa-industry me-2"></i>
+                <span>Plant Management</span>
+            </a>
+        </li>
+
+        <!-- Equipment -->
+        <li>
+            <a asp-controller="AreaOwner" asp-action="ManageEquipment"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Equipment") == true ? "active" : "")">
+                <i class="fas fa-cogs me-2"></i>
+                <span>Equipment</span>
+            </a>
+        </li>
+
+        <!-- Audit Schedules -->
+        <li>
+            <a asp-controller="AreaOwner" asp-action="AuditSchedules"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Audit") == true ? "active" : "")">
+                <i class="fas fa-calendar-alt me-2"></i>
+                <span>Audit Schedules</span>
+            </a>
+        </li>
+
+        <!-- Corrective Actions -->
+        <li>
+            <a asp-controller="AreaOwner" asp-action="ManageActions"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString()?.Contains("Action") == true ? "active" : "")">
+                <i class="fas fa-tasks me-2"></i>
+                <span>Corrective Actions</span>
+            </a>
+        </li>
+
+        <!-- Profile -->
+        <li>
+            <a asp-controller="AreaOwner" asp-action="Profile"
+               class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Profile" ? "active" : "")">
+                <i class="fas fa-edit me-2"></i>
+                <span>Edit Profile</span>
+            </a>
+        </li>
+
+        <!-- Logout -->
+        <li>
+            <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+                <i class="fas fa-sign-out-alt me-2"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<form id="logout-form" asp-controller="Auth" asp-action="Logout" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>

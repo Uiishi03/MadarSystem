@@ -1,0 +1,122 @@
+﻿<nav class="navbar d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <button class="toggle-sidebar" id="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h4 class="mb-0" style="color: var(--dark-blue);">@ViewData["PageTitle"]</h4>
+    </div>
+    <div class="d-flex align-items-center">
+        <!-- Notifications Dropdown -->
+        <div class="dropdown me-3">
+            <button class="btn notification-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="notificationDropdown">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationCount">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" id="notificationList">
+                <li class="dropdown-header">Notifications</li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="text-center py-2">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- User Dropdown -->
+        <div class="dropdown">
+            <button class="btn user-dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <div class="user-avatar">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <span>
+                    @User.Identity.Name
+                    <small class="d-block text-muted" style="font-size: 0.7rem;">
+                        @User.FindFirst("UserType")?.Value
+                    </small>
+                </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" asp-action="Profile" asp-controller="Management">
+                        <i class="fas fa-user me-2"></i>My Profile
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-action="Dashboard" asp-controller="Management">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="#"
+                       onclick="document.getElementById('logout-form').submit(); return false;">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<form id="logout-form" asp-controller="Auth" asp-action="Logout" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById('notificationDropdown').addEventListener('click', function() {
+            loadNotifications();
+        });
+
+        function loadNotifications() {
+            fetch('@Url.Action("GetNotifications", "Management")')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationList = document.getElementById('notificationList');
+                    const notificationCount = document.getElementById('notificationCount');
+
+                    notificationCount.textContent = data.notifications.length;
+                    notificationList.innerHTML = `
+                        <li class="dropdown-header">Notifications</li>
+                        <li><hr class="dropdown-divider"></li>
+                    `;
+
+                    if (data.notifications.length === 0) {
+                        notificationList.innerHTML += `
+                            <li class="px-3 py-2 text-center text-muted">
+                                <i class="fas fa-check-circle me-2"></i>
+                                No important notifications
+                            </li>
+                        `;
+                    } else {
+                        data.notifications.forEach(notification => {
+                            notificationList.innerHTML += `
+                                <li>
+                                    <a class="dropdown-item" href="${notification.link}">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-${notification.icon} text-${notification.type}"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="small">${notification.message}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading notifications:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('@Url.Action("GetNotifications", "Management")')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('notificationCount').textContent = data.notifications.length;
+                });
+        });
+    </script>
+}
